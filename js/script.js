@@ -632,7 +632,7 @@ function newForce() {
         }
 
         drawBeam();
-        closeModal('support-modal');
+        closeModal('force-modal');
         return;
     }
     
