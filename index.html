@@ -1,0 +1,155 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Beam Calculator</title>
+    <meta name="description" content="Beam Calculator">
+    <meta name="author" content="Mathieu Bonte">
+    <link rel="stylesheet" href="css/styles.css?v=1.0">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.2.0/math.js"></script>
+</head>
+
+<body>
+    <div id="wrapper">
+        <div class="toolbar">
+            <div class="tool-group">
+                <div id="new-button" class="first-tool" onclick="newProject()">
+                    <img src="./icons/new.svg" class="icon icon-tool">
+                </div>
+                <div id="open-button" class="middle-tool">
+                    <input type="file" name="file" id="file" class="inputfile" accept=".json" onchange="openFile(this.files)"/>
+                    <label for="file">
+                        <img src="./icons/open.svg" class="icon icon-tool">
+                    </label>
+                </div>
+                <div id="save-button" class="last-tool" onclick="download(JSON.stringify(beam), 'beam_' + new Date().getTime() + '.json','application/json');">
+                    <img src="./icons/save.svg" class="icon icon-tool">
+                </div>
+            </div>
+            <div class="tool-group">
+                <div id="beam-tool" class="first-tool tool" onclick="openModal('beam-modal')">
+                    <img src="./icons/beam.svg" class="icon icon-tool">
+                </div>
+                <div id="support-tool" class="middle-tool tool" onclick="openModal('support-modal'); disableAllToolsBut('support-tool')">
+                    <img id="supportImg" src="./icons/support.svg" class="icon icon-tool">
+                </div>
+                <div id="force-tool" class="middle-tool tool" onclick="openModal('force-modal'); disableAllToolsBut('force-tool')">
+                    <img src="./icons/force.svg" class="icon icon-tool">
+                </div>
+                <div id="load-tool" class="last-tool tool" onclick="openModal('load-modal'); disableAllToolsBut('load-tool')">
+                    <img src="./icons/load.svg" class="icon icon-tool">
+                </div>
+            </div>
+            <div class="tool-group">
+                <div id="svg-tool" class="first-tool tool" onclick="downloadSVG()">
+                    <img src="./icons/svg.svg" class="icon icon-tool">
+                </div>
+                <div id="csv-tool" class="last-tool tool" onclick="downloadCSV()">
+                    <img src="./icons/csv.svg" class="icon icon-tool">
+                </div>
+            </div>
+        </div>
+        <div id="canvas"></div>
+        <div></div>
+    </div>
+    
+    <div id="beam-modal" class="arrow-modal">
+        <div class="modal-content">
+            <div class="modal-title">Nouvelle Poutre</div>
+            <div class="label-input-group">
+                <label for="length">Longueur de la poutre (m)</label>
+                <input type="number" id="length" name="length" placeholder="4.8">
+            </div>
+            <div class="label-input-group">
+                <label for="youngModulus">Module de Young (MPa)</label>
+                <input type="number" id="youngModulus" placeholder="210000" name="youngModulus">
+            </div>         
+            <div class="label-input-group">
+                <label for="inertia">Inertie de la section (cm4)</label>
+                <input type="number" id="inertia" name="inertia" placeholder="68.7">
+            </div>
+            <div class="modal-buttons">
+                <button onclick="closeModal('beam-modal')">Annuler</button>
+                <button onclick="newBeam()">Valider</button>
+            </div>   
+        </div>
+    </div>
+
+    <div id="support-modal" class="arrow-modal">
+        <div class="modal-content">
+            <div class="modal-title">Nouveau support</div>
+            <div class="label-input-group">
+                <label for="supportType">Type de support</label>
+                <select id="supportType" name="supportType" onchange="displaySupportOptions()">
+                    <option>Appui simple</option>
+                    <option>Articulation</option>
+                    <option>Encastrement</option>
+                </select>
+            </div>
+
+            <div id="support-position-input" class="label-input-group">
+                <label for="supportLocation">Position du support (m)</label>
+                <input type="number" id="supportLocation" name="supportLocation" placeholder="0">
+            </div>
+
+            <div id="fixed-position-input" class="label-input-group">
+                <label for="startEndLocation">Position de l'encastrement</label>
+                <select id="startEndLocation" name="startEndLocation">
+                    <option>Extrémité gauche de la poutre</option>
+                    <option>Extrémité droite de la poutre</option>
+                </select>
+            </div>
+
+            <div class="modal-buttons">
+                <button onclick="closeModal('support-modal')">Annuler</button>
+                <button onclick="newSupport()">Valider</button>
+            </div>   
+        </div>
+    </div>
+
+    <div id="force-modal" class="arrow-modal">
+        <div class="modal-content">
+            <div class="modal-title">Nouvelle Force ponctuelle</div>
+            <div class="label-input-group">
+                <label for="forceLocation">Position de la force (m)</label>
+                <input type="number" id="forceLocation" name="forceLocation" placeholder="0">
+            </div>
+            <div class="label-input-group">
+                <label for="forceMagnitude">Intensité de la force (N)</label>
+                <input type="number" id="forceMagnitude" name="forceMagnitude" placeholder="-100">
+            </div>
+            <div class="modal-buttons">
+                <button onclick="closeModal('force-modal')">Annuler</button>
+                <button onclick="newForce()">Valider</button>
+            </div>   
+        </div>
+    </div>
+
+    <div id="load-modal" class="arrow-modal">
+        <div class="modal-content">
+            <div class="modal-title">Bientôt disponible</div>   
+        </div>
+        <div class="modal-buttons">
+            <button onclick="closeModal('load-modal')">Annuler</button>
+        </div> 
+    </div>
+
+    <div id="debug-modal" class="">
+        <div class="modal-content">
+            <div class="modal-title">Debug</div>
+            <div id="debug-text"></div>
+            <div class="modal-buttons">
+                <button onclick="closeModal('debug-modal')">Annuler</button>
+                <button onclick="">Valider</button>
+            </div>
+        </div>
+        
+    </div>
+
+    <script type="application/javascript" src="./js/script.js"></script>
+</body>
+</html>
