@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Thermique du Bâtiment - Exercices</title>
+		<link rel="stylesheet" href="../assets/css/style.css" />
+		<link rel="stylesheet" href="exercices-style.css" />
+		<!--  MathJax -->
+		<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+		<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<a href="index.html" class="card-button">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="24"
+						height="24"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						class="button-icon-left">
+						<path d="M6 8L2 12L6 16"></path>
+						<path d="M2 12H22"></path>
+					</svg>
+					<span>Retour à la séquence</span>
+				</a>
+				<h1>Exercices - Thermique du Bâtiment</h1>
+			</header>
+
+			<main>
+				<!-- Exercice 1 -->
+				<div class="exercice">
+					<div class="tabs">
+						<button class="tab-button active" data-tab="enonce1">Énoncé</button>
+						<button class="tab-button" data-tab="correction1">Correction</button>
+
+						<div id="enonce1" class="tab-content active">
+							<h2>Exercice 1</h2>
+							<p><strong>Calculer</strong> le coefficient de transmission thermique U d'une paroi extérieure constituée des éléments suivants (de l'intérieur vers l'extérieur) :</p>
+							<ul>
+								<li>Enduit plâtre : épaisseur = 14 mm, \( \lambda \) = 0,571 W/m.K</li>
+								<li>Parpaing creux : épaisseur = 20 cm, \( \lambda \) = 0,93 W/m.K</li>
+								<li>Laine de verre (LDV) : épaisseur = 17 cm, \( \lambda \) = 0,04 W/m.K</li>
+								<li>Enduit hydraulique : épaisseur = 15 mm, \( \lambda \) = 0,93 W/m.K</li>
+								<li>Lame d'air: épaisseur = 29mm , R = 0,167 m².K/W</li>
+								<li>BA13 : épaisseur = 13mm, \( \lambda \) = 0,30 W/m.K</li>
+							</ul>
+							<p>On prendra les valeurs de résistance thermique d'échange superficiel de la norme NF EN 12831 :</p>
+							<img src="images/rsi-rse.gif" alt="Tableau des résistances thermiques" style="max-width: 100%; height: auto" />
+							<p><em>Présentez les résultats avec 3 chiffres après la virgule.</em></p>
+						</div>
+
+						<div id="correction1" class="tab-content">
+							<h2>Exercice 1</h2>
+							<p><strong>1. Calcul des résistances thermiques de chaque couche :</strong></p>
+							<p>\( R = \frac{e}{\lambda} \) (où \( e \) est l'épaisseur en mètres et \( \lambda \) la conductivité thermique)</p>
+							<ul>
+								<li>\( R_{enduit\ plâtre} = \frac{0.014}{0.571} = 0,025 \) m².K/W</li>
+								<li>\( R_{parpaing} = \frac{0.20}{0.93} = 0,215 \) m².K/W</li>
+								<li>\( R_{LDV} = \frac{0.17}{0.04} = 4,25 \) m².K/W</li>
+								<li>\( R_{enduit\ hydraulique} = \frac{0.015}{0.93} = 0.016 \) m².K/W</li>
+								<li>\(R_{lame\ d'air} = 0,167\) m².K/W</li>
+								<li>\(R_{BA13} = \frac{0.013}{0.30} = 0.043 \) m².K/W</li>
+							</ul>
+							<p><strong>2. Calcul de la résistance thermique totale de la paroi :</strong></p>
+							<p>Paroi verticale donc \( R_{si} = 0,13 \) et \( R_{se} = 0,04 \)</p>
+							<p>\( R_{totale} = R_{si} + R_{enduit\ plâtre} + R_{parpaing} + R_{LDV} + R_{enduit\ hydraulique} + R_{lame\ d'air} + R_{BA13} + R_{se} \)</p>
+							<p>\( R_{totale} = 0.13 + 0.025 + 0.215 + 4.25 + 0.016 + 0.167 + 0.043 + 0.04 = 4,886 \) m².K/W</p>
+							<p><strong>3. Calcul du coefficient de transmission thermique U :</strong></p>
+							<p>\( U = \frac{1}{R_{totale}} \)</p>
+							<p>\( U = \frac{1}{4.886} = 0.205 \) W/m².K</p>
+						</div>
+					</div>
+				</div>
+
+				<!-- Exercice 2 -->
+				<div class="exercice">
+					<div class="tabs">
+						<button class="tab-button active" data-tab="enonce2">Énoncé</button>
+						<button class="tab-button" data-tab="correction2">Correction</button>
+
+						<div id="enonce2" class="tab-content active">
+							<h2>Exercice 2</h2>
+							<p>
+								Un mur est constitué de briques pleines de 22 cm d’épaisseur. Sa conductivité thermique \(λ\) est de 1,15 W/(m.K). On souhaite ramener le coefficient de transmission thermique U de ce
+								mur à \(0,5\) \(W/m².K\) en utilisant un isolant de conductivité thermique (λ) de 0,04 W/(m.K).
+								<br />
+								<strong>Calculer</strong> l’épaisseur d’isolant à ajouter.
+							</p>
+						</div>
+						<div id="correction2" class="tab-content">
+							<h2>Exercice 2</h2>
+							<p><strong>1. On calcule la résistance thermique de la paroi de brique : </strong></p>
+							<p>\(R_{brique} = \frac{e}{\lambda} = \frac{0.22}{1.15} = 0.191\) m².K/W</p>
+							<p><strong>2. On cherche la résistance thermique totale de la paroi pour atteindre notre objectif :</strong></p>
+							<p>\(R_{totale} = \frac{1}{U} = \frac{1}{0.5} = 2\) m².K/W</p>
+							<p>Paroi verticale donc Rsi= 0,13 et Rse= 0,04</p>
+							<p><strong>3. On calcule la résistance thermique que l'isolant doit apporter:</strong></p>
+							<p>\( R_{isolant} = R_{totale} - (R_{si} + R_{se} + R_{brique}) \)</p>
+							<p>\(R_{isolant} = 2 - (0.13+ 0.04 + 0.191) = 1.639 \) m².K/W</p>
+							<p><strong>4. On calcule l'épaisseur de l'isolant:</strong></p>
+							<p>\(e_{isolant} = R_{isolant} \times \lambda_{isolant} = 1.639 \times 0.04 = 0.066\) m soit 6,6 cm.</p>
+						</div>
+					</div>
+				</div>
+			</main>
+		</div>
+
+		<script>
+			document.addEventListener("DOMContentLoaded", () => {
+				// S'assure que le DOM est chargé
+				const tabContainers = document.querySelectorAll(".exercice");
+
+				tabContainers.forEach((tabContainer) => {
+					const tabButtons = tabContainer.querySelectorAll(".tab-button");
+					const tabContents = tabContainer.querySelectorAll(".tab-content");
+
+					tabButtons.forEach((button) => {
+						button.addEventListener("click", () => {
+							// Désactiver tous les boutons et masquer tous les contenus de l'exercice courant
+							tabButtons.forEach((btn) => btn.classList.remove("active"));
+							tabContents.forEach((content) => content.classList.remove("active"));
+
+							// Activer le bouton cliqué et afficher le contenu correspondant
+							button.classList.add("active");
+							const tabId = button.dataset.tab;
+							tabContainer.querySelector(`#${tabId}`).classList.add("active"); // Portée limitée
+						});
+					});
+				});
+			});
+		</script>
+	</body>
+</html>

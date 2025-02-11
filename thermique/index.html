@@ -47,7 +47,7 @@
 			// Données des étapes de la séquence (maintenant avec des chemins relatifs corrects)
 			const etapes = [
 				{
-					type: "Leçon",
+					type: "Vidéo",
 					titre: "Introduction à la thermique du bâtiment",
 					description: "Vidéo de cours sur les principales sources de déperditions dans un bâtiment",
 					icone: "video.svg",
@@ -61,19 +61,32 @@
 					url: "introduction-questions.html",
 				},
 				{
-					type: "Leçon",
+					type: "Vidéo",
 					titre: "Réaliser un bilan thermique",
 					description: "Tutoriel vidéo pour réaliser le bilan thermique d'une maison.",
 					icone: "video.svg",
 					url: "bilan-thermique.html",
 				},
-				{ type: "Leçon", titre: "Isolation thermique", description: "Matériaux isolants, calculs de résistance thermique, etc.", icone: "lesson.svg", url: "lecon-2.html" },
+				{
+					type: "Exercices",
+					titre: "Déperditions surfaciques",
+					description: "Exercices corrigés de calculs de déperditions",
+					icone: "exercise.svg",
+					url: "bilan-thermique-exercices.html",
+				},
+				{
+					type: "Leçon",
+					titre: "Condensation dans les parois",
+					description: "Leçon sur le thème de la condensation sur et dans les parois. Quels phénomènes physiques ? Quelles conséquences ? Comment s'en prémunir ?",
+					icone: "lesson.svg",
+					url: "condensation.html",
+				},
 				{
 					type: "TP",
-					titre: "Mesure de la conductivité thermique",
-					description: "Expérimentation en laboratoire.",
+					titre: "Étude de la condensation dans une paroi.",
+					description: "Simulation du transfert d'humidité dans une paroi. Comment se protéger contre la condensation ?",
 					icone: "lab.svg",
-					url: "tp-1.html",
+					url: "condensation-lab.html",
 				},
 			];
 

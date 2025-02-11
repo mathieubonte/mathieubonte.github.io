@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Diagramme Psychrométrique Interactif</title>
+		<style>
+			/* ... (le CSS reste inchangé, voir code précédent) ... */
+			body {
+				font-family: sans-serif;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+			}
+
+			#chartContainer {
+				position: relative;
+				width: 600px; /* Largeur du graphique */
+				height: 400px; /* Hauteur du graphique */
+			}
+
+			#psychroChart {
+				border: 1px solid black;
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%; /* Prend toute la largeur du conteneur */
+				height: 100%; /* Prend toute la hauteur du conteneur */
+			}
+
+			#overlayCanvas {
+				/* border: 1px solid red;  Pour visualiser le canvas (à retirer en production)*/
+				position: absolute;
+				top: 0;
+				left: 0;
+				width: 100%; /* Prend toute la largeur */
+				height: 100%; /* Prend toute la hauteur*/
+				pointer-events: none; /* Important ! */
+				z-index: 10;
+			}
+
+			.controls {
+				margin-top: 20px;
+				display: flex;
+				flex-direction: column;
+				align-items: flex-start;
+			}
+
+			.control-row {
+				display: flex;
+				align-items: center;
+				margin-bottom: 10px;
+			}
+
+			.control-row label {
+				margin-right: 10px;
+			}
+
+			.control-row input[type="range"] {
+				width: 200px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Diagramme Psychrométrique Interactif</h1>
+
+		<div id="chartContainer">
+			<canvas id="psychroChart" width="600" height="400"></canvas>
+			<canvas id="overlayCanvas" width="600" height="400"></canvas>
+		</div>
+
+		<div class="controls">
+			<div class="control-row">
+				<label for="dryBulb">Température (°C):</label>
+				<input type="range" id="dryBulb" min="0" max="40" value="25" step="1" />
+				<span id="dryBulbValue">25</span>
+			</div>
+			<div class="control-row">
+				<label for="relHum">Humidité Relative (%):</label>
+				<input type="range" id="relHum" min="0" max="100" value="50" step="1" />
+				<span id="relHumValue">50</span>
+			</div>
+			<p>Point de Rosée : <span id="dewPoint"></span> °C</p>
+		</div>
+
+		<script src="../assets/js/psychrolib.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+
+		<script>
+			let psychrochart = null;
+			const chartContainer = document.getElementById("chartContainer");
+			const dewPointDisplay = document.getElementById("dewPoint");
+			const dryBulbInput = document.getElementById("dryBulb");
+			const dryBulbValue = document.getElementById("dryBulbValue");
+			const relHumInput = document.getElementById("relHum");
+			const relHumValue = document.getElementById("relHumValue");
+			const overlayCanvas = document.getElementById("overlayCanvas");
+			const overlayCtx = overlayCanvas.getContext("2d");
+
+			function get_psychrochart(altitude) {
+				const ctx = document.getElementById("psychroChart").getContext("2d");
+
+				// Valeurs pour le diagramme.  NE PAS METTRE DE VALEURS NÉGATIVES.
+				const dryBulbTemps = [0, 5, 10, 15, 20, 25, 30, 35, 40]; // °C
+				const relativeHumidities = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]; // 10% à 100%
+
+				const psychrolib = new Psychrometrics();
+				psychrolib.SetUnitSystem(psychrolib.SI);
+				const pressure = psychrolib.GetStandardAtmPressure(altitude);
+
+				const datasets = relativeHumidities.map((relHum) => {
+					const humidityRatios = dryBulbTemps.map((dryBulbTemp) => {
+						return psychrolib.GetHumRatioFromRelHum(dryBulbTemp, relHum, pressure);
+					});
+
+					return {
+						label: "Humidity: " + relHum * 100 + "%",
+						data: humidityRatios,
+						fill: false,
+						borderWidth: 1,
+						borderColor: "black",
+						tension: 0.4, // Légère courbure pour les lignes (essayez 0 pour des lignes droites)
+						pointRadius: 0, // Masque les points
+					};
+				});
+
+				if (psychrochart) {
+					psychrochart.destroy();
+				}
+
+				psychrochart = new Chart(ctx, {
+					type: "line",
+					data: {
+						labels: dryBulbTemps,
+						datasets: datasets,
+					},
+					options: {
+						animation: false, // Désactive l'animation
+						responsive: false, // Le canvas ne se redimensionne pas automatiquement
+						maintainAspectRatio: false,
+						plugins: {
+							legend: { display: false }, // Masque la légende par défaut
+							title: {
+								// Titre du graphique
+								display: true,
+								text: "Diagramme Psychrométrique (Altitude = 0 m)",
+								font: {
+									size: 16,
+								},
+							},
+						},
+						scales: {
+							x: {
+								type: "linear", // Important: Utilise une échelle linéaire
+								position: "bottom",
+								title: {
+									display: true,
+									text: "Température sèche (°C)",
+								},
+								min: 0, // Minimum de l'axe des x
+								max: 40, // Maximum de l'axe des x
+								ticks: {
+									stepSize: 5, // Affiche un tick tous les 5°C
+									autoSkip: false, // Important: force l'affichage de tous les ticks
+									callback: function (value, index, ticks) {
+										// Permet d'ajouter °C
+										return value + " °C";
+									},
+								},
+							},
+							y: {
+								type: "linear", // Important: Utilise une échelle linéaire
+								position: "right",
+								title: {
+									display: true,
+									text: "Humidité Absolue (kg eau/kg air sec)",
+								},
+								min: 0, // Minimum de l'axe des y
+								max: 0.06, // Maximum de l'axe des y (ajustez selon vos besoins)
+								ticks: {
+									stepSize: 0.01, // Affiche un tick tous les 0.01 kg/kg
+									autoSkip: false, // Important: force l'affichage de tous les ticks
+									callback: function (value, index, ticks) {
+										// Permet d'ajouter  kg/kg
+										return value.toFixed(2) + " kg/kg"; // Formatage à 2 décimales
+									},
+								},
+							},
+						},
+					},
+				});
+			}
+
+			function plotPoint(dryBulb, relHum) {
+				if (!psychrochart) return;
+
+				overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+
+				const psychrolib = new Psychrometrics();
+				psychrolib.SetUnitSystem(psychrolib.SI);
+				const pressure = psychrolib.GetStandardAtmPressure(0);
+
+				const dewPointTemp = psychrolib.GetTDewPointFromRelHum(dryBulb, relHum / 100);
+				const humidityRatio = psychrolib.GetHumRatioFromRelHum(dryBulb, relHum / 100, pressure);
+
+				const xScale = psychrochart.scales.x;
+				const yScale = psychrochart.scales.y;
+
+				// Conversion des valeurs en pixels *correctement*
+				const x = xScale.getPixelForValue(dryBulb); // Utilisez directement dryBulb
+				const y = yScale.getPixelForValue(humidityRatio); // Utilisez directement humidityRatio
+				const dewPointX = xScale.getPixelForValue(dewPointTemp); // Utilisez directement dewPointTemp
+
+				const dewPointText = dewPointTemp.toFixed(2);
+				dewPointDisplay.textContent = dewPointText;
+
+				// Lignes pointillées
+				overlayCtx.beginPath();
+				overlayCtx.strokeStyle = "red";
+				overlayCtx.setLineDash([5, 3]);
+				overlayCtx.moveTo(dewPointX, psychrochart.chartArea.bottom); // chartArea.bottom pour la ligne verticale
+				overlayCtx.lineTo(dewPointX, y);
+				overlayCtx.moveTo(dewPointX, y); // chartArea.left pour la ligne horizontale
+				overlayCtx.lineTo(x, y);
+				overlayCtx.stroke();
+				overlayCtx.setLineDash([]);
+
+				// Point de rosée (sur l'axe des x, au bas du graphique)
+				overlayCtx.beginPath();
+				overlayCtx.arc(dewPointX, psychrochart.chartArea.bottom, 5, 0, 2 * Math.PI);
+				overlayCtx.fillStyle = "blue";
+				overlayCtx.fill();
+				overlayCtx.strokeStyle = "black";
+				overlayCtx.stroke();
+
+				// Texte du point de rosée (légèrement décalé pour la visibilité)
+				overlayCtx.fillStyle = "blue";
+				overlayCtx.font = "12px Arial";
+				overlayCtx.fillText(dewPointText + "°C", dewPointX + 5, psychrochart.chartArea.bottom - 10);
+
+				// Point principal (température sèche et humidité relative)
+				overlayCtx.beginPath();
+				overlayCtx.arc(x, y, 5, 0, 2 * Math.PI);
+				overlayCtx.fillStyle = "yellow";
+				overlayCtx.fill();
+				overlayCtx.strokeStyle = "black";
+				overlayCtx.stroke();
+			}
+
+			document.addEventListener("DOMContentLoaded", function () {
+				get_psychrochart(0);
+
+				dryBulbInput.addEventListener("input", function () {
+					dryBulbValue.textContent = dryBulbInput.value;
+					plotPoint(parseFloat(dryBulbInput.value), parseFloat(relHumInput.value));
+				});
+
+				relHumInput.addEventListener("input", function () {
+					relHumValue.textContent = relHumInput.value;
+					plotPoint(parseFloat(dryBulbInput.value), parseFloat(relHumInput.value));
+				});
+			});
+		</script>
+	</body>
+</html>
