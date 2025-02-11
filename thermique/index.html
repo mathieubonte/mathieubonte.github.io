@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Thermique du Bâtiment - Séquence</title>
+		<link rel="stylesheet" href="../assets/css/style.css" />
+		<!-- Lien relatif vers le CSS global -->
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<a href="../index.html" class="card-button">
+					<!-- Utilisation de la classe CSS -->
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						width="24"
+						height="24"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						class="button-icon-left">
+						<path d="M6 8L2 12L6 16"></path>
+						<path d="M2 12H22"></path>
+					</svg>
+					<span>Retour à l'accueil</span>
+				</a>
+				<h1>Thermique du Bâtiment</h1>
+				<p>Séquence complète sur la thermique du bâtiment.</p>
+			</header>
+
+			<!-- Frise chronologique verticale -->
+			<div class="timeline">
+				<div class="timeline-line-container">
+					<div class="timeline-line"></div>
+				</div>
+				<div id="timeline-container" class="timeline-container">
+					<!-- Les étapes seront insérées ici -->
+				</div>
+			</div>
+		</div>
+
+		<script>
+			// Données des étapes de la séquence (maintenant avec des chemins relatifs corrects)
+			const etapes = [
+				{
+					type: "Leçon",
+					titre: "Introduction à la thermique du bâtiment",
+					description: "Vidéo de cours sur les principales sources de déperditions dans un bâtiment",
+					icone: "video.svg",
+					url: "introduction.html",
+				},
+				{
+					type: "Questions de cours",
+					titre: "à connaître par ❤️",
+					description: "Questions de cours sur les bases de la thermique du bâtiment",
+					icone: "questions.svg",
+					url: "introduction-questions.html",
+				},
+				{
+					type: "Leçon",
+					titre: "Réaliser un bilan thermique",
+					description: "Tutoriel vidéo pour réaliser le bilan thermique d'une maison.",
+					icone: "video.svg",
+					url: "bilan-thermique.html",
+				},
+				{ type: "Leçon", titre: "Isolation thermique", description: "Matériaux isolants, calculs de résistance thermique, etc.", icone: "lesson.svg", url: "lecon-2.html" },
+				{
+					type: "TP",
+					titre: "Mesure de la conductivité thermique",
+					description: "Expérimentation en laboratoire.",
+					icone: "lab.svg",
+					url: "tp-1.html",
+				},
+			];
+
+			// Fonction pour créer une étape de la timeline
+			function creerEtapeTimeline(etape, index) {
+				const isFirst = index === 0;
+				const isLast = index === etapes.length - 1;
+
+				// Masque la ligne supérieure si c'est la première étape et la ligne du bas si c'est la dernière.
+				const topLineClasses = isFirst ? "timeline-top-line-hidden" : "timeline-top-line";
+				const bottomLineClasses = isLast ? "timeline-bottom-line-hidden" : "timeline-bottom-line";
+
+				return `
+        <div class="timeline-step">
+            <div class="timeline-icon-container">
+                <img src="../assets/icons/${etape.icone}">
+                <div class="${topLineClasses}"></div>
+                <div class="${bottomLineClasses}"></div>
+            </div>
+            <div class="timeline-content">
+                <h3 class="timeline-title">
+                    <a href="${etape.url}" class="timeline-link">${etape.type} : ${etape.titre}</a>
+                </h3>
+                <p class="timeline-description">${etape.description}</p>
+            </div>
+        </div>
+      `;
+			}
+
+			// Générer les étapes et les ajouter au conteneur
+			const container = document.getElementById("timeline-container");
+			etapes.forEach((etape, index) => {
+				container.innerHTML += creerEtapeTimeline(etape, index);
+			});
+		</script>
+	</body>
+</html>

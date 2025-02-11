@@ -1,155 +1,90 @@
-<!doctype html>
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>STI2D Architecture et Construction - Séquences</title>
+		<link rel="stylesheet" href="assets/css/style.css" />
+		<!-- Lien vers le CSS externe -->
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<h1>Séquences de Cours - STI2D AC</h1>
+				<p>Explorez les séquences pédagogiques pour la spécialité Architecture et Construction.</p>
+			</header>
 
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <title>Beam Calculator</title>
-    <meta name="description" content="Beam Calculator">
-    <meta name="author" content="Mathieu Bonte">
-    <link rel="stylesheet" href="css/styles.css?v=1.0">
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@svgdotjs/svg.js@3.0/dist/svg.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.2.0/math.js"></script>
-</head>
+			<!-- Liste des séquences (générée dynamiquement) -->
+			<div id="sequences-container"></div>
+		</div>
 
-<body>
-    <div id="wrapper">
-        <div class="toolbar">
-            <div class="tool-group">
-                <div id="new-button" class="first-tool" onclick="newProject()">
-                    <img src="./icons/new.svg" class="icon icon-tool">
-                </div>
-                <div id="open-button" class="middle-tool">
-                    <input type="file" name="file" id="file" class="inputfile" accept=".json" onchange="openFile(this.files)"/>
-                    <label for="file">
-                        <img src="./icons/open.svg" class="icon icon-tool">
-                    </label>
-                </div>
-                <div id="save-button" class="last-tool" onclick="download(JSON.stringify(beam), 'beam_' + new Date().getTime() + '.json','application/json');">
-                    <img src="./icons/save.svg" class="icon icon-tool">
-                </div>
-            </div>
-            <div class="tool-group">
-                <div id="beam-tool" class="first-tool tool" onclick="openModal('beam-modal')">
-                    <img src="./icons/beam.svg" class="icon icon-tool">
-                </div>
-                <div id="support-tool" class="middle-tool tool" onclick="openModal('support-modal'); disableAllToolsBut('support-tool')">
-                    <img id="supportImg" src="./icons/support.svg" class="icon icon-tool">
-                </div>
-                <div id="force-tool" class="middle-tool tool" onclick="openModal('force-modal'); disableAllToolsBut('force-tool')">
-                    <img src="./icons/force.svg" class="icon icon-tool">
-                </div>
-                <div id="load-tool" class="last-tool tool" onclick="openModal('load-modal'); disableAllToolsBut('load-tool')">
-                    <img src="./icons/load.svg" class="icon icon-tool">
-                </div>
-            </div>
-            <div class="tool-group">
-                <div id="svg-tool" class="first-tool tool" onclick="downloadSVG()">
-                    <img src="./icons/svg.svg" class="icon icon-tool">
-                </div>
-                <div id="csv-tool" class="last-tool tool" onclick="downloadCSV()">
-                    <img src="./icons/csv.svg" class="icon icon-tool">
-                </div>
-            </div>
-        </div>
-        <div id="canvas"></div>
-        <div></div>
-    </div>
-    
-    <div id="beam-modal" class="arrow-modal">
-        <div class="modal-content">
-            <div class="modal-title">Nouvelle Poutre</div>
-            <div class="label-input-group">
-                <label for="length">Longueur de la poutre (m)</label>
-                <input type="number" id="length" name="length" placeholder="4.8">
-            </div>
-            <div class="label-input-group">
-                <label for="youngModulus">Module de Young (MPa)</label>
-                <input type="number" id="youngModulus" placeholder="210000" name="youngModulus">
-            </div>         
-            <div class="label-input-group">
-                <label for="inertia">Inertie de la section (cm4)</label>
-                <input type="number" id="inertia" name="inertia" placeholder="68.7">
-            </div>
-            <div class="modal-buttons">
-                <button onclick="closeModal('beam-modal')">Annuler</button>
-                <button onclick="newBeam()">Valider</button>
-            </div>   
-        </div>
-    </div>
+		<script>
+			// Données des séquences
+			const sequences = [
+				{
+					titre: "Lecture de plans",
+					description: "Description concise de la séquence 1.",
+					icone: "M12 6v6m0 0v6m0-6h6m-6 0H6",
+					detailsUrl: "seq-lecture-de-plans.html",
+					disabled: true,
+				},
+				{
+					titre: "Bases de l'économie de la construction",
+					description: "Autre description concise de la séquence 2.",
+					icone: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4",
+					detailsUrl: "sequence2.html",
+					disabled: true,
+				},
+				{
+					titre: "Les fondations",
+					description: "Autre description concise de la séquence 3.",
+					icone: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4",
+					detailsUrl: "sequence3.html",
+					disabled: true,
+				},
+				{
+					titre: "Thermique du bâtiment",
+					description: "Description concise de la séquence 4.",
+					icone: "M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4",
+					detailsUrl: "thermique/index.html",
+					disabled: false,
+				},
+			];
 
-    <div id="support-modal" class="arrow-modal">
-        <div class="modal-content">
-            <div class="modal-title">Nouveau support</div>
-            <div class="label-input-group">
-                <label for="supportType">Type de support</label>
-                <select id="supportType" name="supportType" onchange="displaySupportOptions()">
-                    <option>Appui simple</option>
-                    <option>Articulation</option>
-                    <option>Encastrement</option>
-                </select>
-            </div>
+			// Fonction pour créer une carte de séquence
+			function creerCarteSequence(sequence) {
+				const isDisabled = sequence.disabled;
 
-            <div id="support-position-input" class="label-input-group">
-                <label for="supportLocation">Position du support (m)</label>
-                <input type="number" id="supportLocation" name="supportLocation" placeholder="0">
-            </div>
+				return `
+                <div class="card ${isDisabled ? "card-disabled" : ""}">
+                    <div class="card-icon-container">
+                        <svg class="card-icon ${isDisabled ? "icon-disabled" : ""}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${sequence.icone}"></path>
+                        </svg>
+                    </div>
+                    <div class="card-content">
+                        <h2 class="card-title">
+                            <a href="${isDisabled ? "#" : sequence.detailsUrl}" class="${isDisabled ? "link-disabled" : ""}">${sequence.titre}</a>
+                        </h2>
+                        <p class="card-description">${sequence.description}</p>
+                        <div class="card-button-container">
+                            <a href="${isDisabled ? "#" : sequence.detailsUrl}" class="card-button ${isDisabled ? "button-disabled" : ""}">
+                                Démarrer
+                                <svg class="button-icon-right" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                				</svg>
+							</a>
+						</div>
+					</div>
+				</div>
+			`;
+			}
 
-            <div id="fixed-position-input" class="label-input-group">
-                <label for="startEndLocation">Position de l'encastrement</label>
-                <select id="startEndLocation" name="startEndLocation">
-                    <option>Extrémité gauche de la poutre</option>
-                    <option>Extrémité droite de la poutre</option>
-                </select>
-            </div>
-
-            <div class="modal-buttons">
-                <button onclick="closeModal('support-modal')">Annuler</button>
-                <button onclick="newSupport()">Valider</button>
-            </div>   
-        </div>
-    </div>
-
-    <div id="force-modal" class="arrow-modal">
-        <div class="modal-content">
-            <div class="modal-title">Nouvelle Force ponctuelle</div>
-            <div class="label-input-group">
-                <label for="forceLocation">Position de la force (m)</label>
-                <input type="number" id="forceLocation" name="forceLocation" placeholder="0">
-            </div>
-            <div class="label-input-group">
-                <label for="forceMagnitude">Intensité de la force (N)</label>
-                <input type="number" id="forceMagnitude" name="forceMagnitude" placeholder="-100">
-            </div>
-            <div class="modal-buttons">
-                <button onclick="closeModal('force-modal')">Annuler</button>
-                <button onclick="newForce()">Valider</button>
-            </div>   
-        </div>
-    </div>
-
-    <div id="load-modal" class="arrow-modal">
-        <div class="modal-content">
-            <div class="modal-title">Bientôt disponible</div>   
-        </div>
-        <div class="modal-buttons">
-            <button onclick="closeModal('load-modal')">Annuler</button>
-        </div> 
-    </div>
-
-    <div id="debug-modal" class="">
-        <div class="modal-content">
-            <div class="modal-title">Debug</div>
-            <div id="debug-text"></div>
-            <div class="modal-buttons">
-                <button onclick="closeModal('debug-modal')">Annuler</button>
-                <button onclick="">Valider</button>
-            </div>
-        </div>
-        
-    </div>
-
-    <script type="application/javascript" src="./js/script.js"></script>
-</body>
+			// Afficher les séquences
+			const container = document.getElementById("sequences-container");
+			sequences.forEach((sequence) => {
+				container.innerHTML += creerCarteSequence(sequence);
+			});
+		</script>
+	</body>
 </html>
