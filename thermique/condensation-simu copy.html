@@ -1,0 +1,36 @@
+function dessinerDiagrammeGlaser(data) { const canvas = document.getElementById("glaser-chart"); const ctx = canvas.getContext("2d"); // Effacer le canvas précédent ctx.clearRect(0, 0, canvas.width,
+canvas.height); if (!data || data.length === 0) return; // 1. Déterminer les échelles (min et max) const minX = 0; // La position commence toujours à 0 const maxX = Math.max(...data.map(p => p.x));
+const minTemp = Math.min(...data.map(p => p.temp)); const maxTemp = Math.max(...data.map(p => p.temp)); const minPsat = Math.min(...data.map(p => p.psat), ...data.map(p => p.pvap)); // Min des deux
+courbes const maxPsat = Math.max(...data.map(p => p.psat), ...data.map(p => p.pvap)); // Max des deux // Ajouter une marge pour éviter que les points soient coupés const margin = 5; //pixels //
+Hauteur pour le diagramme de température const tempHeight = 50; const tempTop = canvas.height - tempHeight - margin; // Position verticale du diagramme de température //Echelle diagramme du bas: const
+tempScaleY = tempHeight / (maxTemp - minTemp); //Pour diagramme bas const tempScaleX = (canvas.width - 2 * margin) / maxX; // Echelles pour le diagramme principal (pression) const scaleX =
+(canvas.width - 2 * margin) / maxX; const scaleY = (tempTop - 2 * margin) / (maxPsat - minPsat); // Fonctions de conversion (valeurs réelles -> coordonnées du canvas) function toCanvasX(x) { return
+margin + x * scaleX; } function toCanvasY(pressure) { return tempTop - (pressure - minPsat) * scaleY; } // Fonction toCanvas pour la température (diagramme du bas) function toCanvasTempY(temp) {
+return canvas.height - margin - (temp - minTemp) * tempScaleY ; } // 2. Dessiner les axes // Axe X (position) - commun aux deux diagrammes ctx.beginPath(); ctx.strokeStyle = "black"; ctx.lineWidth =
+1; ctx.moveTo(toCanvasX(0), tempTop); ctx.lineTo(toCanvasX(maxX), tempTop); ctx.stroke(); // Axe Y gauche (pression) ctx.beginPath(); ctx.moveTo(toCanvasX(0), toCanvasY(minPsat));
+ctx.lineTo(toCanvasX(0), toCanvasY(maxPsat)); ctx.stroke(); // Axe Y droit (pourrait être utilisé pour une autre échelle, mais pas dans ce cas) //Axe Y Température ctx.beginPath(); ctx.strokeStyle =
+"black"; ctx.lineWidth = 1; ctx.moveTo(toCanvasX(0), canvas.height - margin); ctx.lineTo(toCanvasX(maxX), canvas.height - margin); //Axe du bas ctx.stroke(); // 3. Dessiner les courbes // Courbe Psat
+ctx.beginPath(); ctx.strokeStyle = "blue"; ctx.lineWidth = 2; ctx.moveTo(toCanvasX(data[0].x), toCanvasY(data[0].psat)); for (let i = 1; i < data.length; i++) { ctx.lineTo(toCanvasX(data[i].x),
+toCanvasY(data[i].psat)); } ctx.stroke(); // Courbe Pvap ctx.beginPath(); ctx.strokeStyle = "red"; ctx.lineWidth = 2; ctx.moveTo(toCanvasX(data[0].x), toCanvasY(data[0].pvap)); for (let i = 1; i <
+data.length; i++) { ctx.lineTo(toCanvasX(data[i].x), toCanvasY(data[i].pvap)); } ctx.stroke(); // Courbe Température ctx.beginPath(); ctx.strokeStyle = "green"; ctx.lineWidth = 2;
+ctx.moveTo(toCanvasX(data[0].x), toCanvasTempY(data[0].temp)); for(let i = 1; i < data.length; i++){ ctx.lineTo(toCanvasX(data[i].x), toCanvasTempY(data[i].temp)); } ctx.stroke(); // 4. Dessiner les
+graduations et les étiquettes (optionnel, mais améliore la lisibilité) // Échelle X (position) - Exemples de graduations const numXTicks = 5; // Nombre de graduations sur l'axe X for (let i = 0; i <=
+numXTicks; i++) { const x = i * maxX / numXTicks; const canvasX = toCanvasX(x); // Graduations sur l'axe principal (pression) ctx.beginPath(); ctx.moveTo(canvasX, tempTop); ctx.lineTo(canvasX, tempTop
++ 5); // Petites marques ctx.stroke(); ctx.font = "12px Arial"; ctx.fillStyle = "black"; ctx.textAlign = "center"; ctx.fillText(x.toFixed(2), canvasX, tempTop + 20); // Étiquettes (position en mètres)
+// Graduations sur l'axe de température (en bas) ctx.beginPath(); ctx.moveTo(canvasX, canvas.height - margin); ctx.lineTo(canvasX, canvas.height - margin - 5); ctx.stroke(); // Pas d'étiquettes
+répétées pour l'axe de température (car même échelle que l'axe principal) } // Échelle Y (pression) - Exemples de graduations const numYTicks = 5; for (let i = 0; i <= numYTicks; i++) { const p =
+minPsat + i * (maxPsat - minPsat) / numYTicks; const canvasY = toCanvasY(p); ctx.beginPath(); ctx.moveTo(toCanvasX(0) - 5, canvasY); ctx.lineTo(toCanvasX(0), canvasY); ctx.stroke(); ctx.font = "12px
+Arial"; ctx.fillStyle = "black"; ctx.textAlign = "right"; ctx.textBaseline = "middle"; ctx.fillText(p.toFixed(0), toCanvasX(0) - 10, canvasY); // Étiquettes (pression) } // Échelle Y (température)
+const numTempTicks = 5; for(let i=0; i<= numTempTicks; i++){ const temp = minTemp + i* (maxTemp-minTemp) / numTempTicks; const canvasY = toCanvasTempY(temp); ctx.beginPath();
+ctx.moveTo(toCanvasX(maxX) + 5, canvasY); ctx.lineTo(toCanvasX(maxX), canvasY); ctx.stroke(); ctx.font = "12px Arial"; ctx.fillStyle = "black"; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+ctx.fillText(temp.toFixed(1), toCanvasX(maxX) + 10, canvasY); } // 5. Légende (optionnel) // Rectangle pour la légende const legendX = canvas.width - 120; const legendY = 10; const legendWidth = 110;
+const legendHeight = 80; ctx.beginPath(); ctx.rect(legendX, legendY, legendWidth, legendHeight); ctx.fillStyle = "white"; // Fond blanc pour la légende ctx.fill(); ctx.strokeStyle = "black";
+ctx.stroke(); // Texte de la légende ctx.font = "12px Arial"; ctx.fillStyle = "blue"; ctx.textAlign = "left"; ctx.textBaseline = "top"; ctx.fillText("Psat", legendX + 10, legendY + 10); ctx.fillStyle
+= "red"; ctx.fillText("Pvap", legendX + 10, legendY + 30); ctx.fillStyle = "green"; ctx.fillText("Temp", legendX+10, legendY + 50); } // Dans votre fonction updateChart : function updateChart() {
+const glaserData = calculateGlaserData(); if (glaserData) { dessinerDiagrammeGlaser(glaserData); // Appel de la fonction } else { const canvas = document.getElementById("glaser-chart"); const ctx =
+canvas.getContext("2d"); ctx.clearRect(0, 0, canvas.width, canvas.height); // Effacer si pas de données } } //Très important, pour que le rendu soit correcte, il faut adapter la taille du canvas.
+//Soit en css avec !important, comme dans le code donné précedement //Soit via javascript: const canvas = document.getElementById('glaser-chart'); canvas.width = 600; // Ou la largeur que vous voulez
+canvas.height = 400; // Ou la hauteur que vous voulez (300 pour la partie pression + 50 + marges) //Appel initial: document.addEventListener('DOMContentLoaded', (event) => { //Vos initialisations
+updateLayersStyle(); updateChart(); // ... autres initialisations ... // Ecouteur d'evenement pour les changements de conditions document.getElementById("temp-int").addEventListener("input",
+updateChart); document.getElementById("temp-ext").addEventListener("input", updateChart); document.getElementById("humid-int").addEventListener("input", updateChart);
+document.getElementById("humid-ext").addEventListener("input", updateChart); });
